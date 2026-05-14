@@ -28,8 +28,8 @@ def _get_scale():
     dpi = screen.logicalDotsPerInch()
     dpi_scale = dpi / 96.0
     res_scale = min(w / 1366.0, h / 768.0)
-    scale = dpi_scale * max(res_scale, 0.9)
-    return max(1.0, min(scale, 2.2))
+    scale = dpi_scale * max(res_scale, 0.95)
+    return max(1.0, min(scale, 1.4))
 
 
 def _s(v, sc):
@@ -42,7 +42,7 @@ class Ui_Widget(object):
         sc = self._sc
 
         Widget.setObjectName("Widget")
-        Widget.resize(_s(1280, sc), _s(860, sc))
+        Widget.resize(_s(1500, sc), _s(920, sc))
 
         self.centralwidget = QtWidgets.QWidget(Widget)
         Widget.setCentralWidget(self.centralwidget)
@@ -54,7 +54,7 @@ class Ui_Widget(object):
         # ── LEFT PANEL ──
         self.leftPanel = QtWidgets.QFrame()
         self.leftPanel.setObjectName("leftPanel")
-        self.leftPanel.setFixedWidth(_s(300, sc))
+        self.leftPanel.setFixedWidth(_s(280, sc))
 
         leftScroll = QtWidgets.QScrollArea()
         leftScroll.setWidgetResizable(True)
@@ -63,8 +63,8 @@ class Ui_Widget(object):
         leftBox = QtWidgets.QWidget()
         leftBox.setObjectName("leftBox")
         lv = QtWidgets.QVBoxLayout(leftBox)
-        lv.setContentsMargins(_s(8,sc), _s(10,sc), _s(8,sc), _s(10,sc))
-        lv.setSpacing(_s(6,sc))
+        lv.setContentsMargins(_s(4,sc), _s(6,sc), _s(4,sc), _s(6,sc))
+        lv.setSpacing(_s(4,sc))
 
         # Mô hình sinh kịch bản
         lv.addWidget(self._lbl("Mô hình sinh kịch bản", "grpLabel"))
@@ -92,12 +92,12 @@ class Ui_Widget(object):
         # File đường dẫn Proxy
         lv.addWidget(self._lbl("File đường dẫn Proxy", "grpLabel"))
         proxy_row = QtWidgets.QHBoxLayout()
-        proxy_row.setSpacing(_s(6, sc))
+        proxy_row.setSpacing(_s(5, sc))
         self.le_proxy_file = self._le("Chọn file proxy (.txt)...")
         self.le_proxy_file.setReadOnly(True)
         btn_proxy_browse = QtWidgets.QPushButton("📂")
         btn_proxy_browse.setObjectName("proxyBrowseBtn")
-        btn_proxy_browse.setFixedSize(_s(34, sc), _s(28, sc))
+        btn_proxy_browse.setFixedSize(_s(32, sc), _s(26, sc))
         btn_proxy_browse.setCursor(QtCore.Qt.PointingHandCursor)
         self.btn_proxy_browse = btn_proxy_browse
         proxy_row.addWidget(self.le_proxy_file, 1)
@@ -113,7 +113,7 @@ class Ui_Widget(object):
         # Mở thư mục
         self.btn_open_folder = QtWidgets.QPushButton("🗂  Mở thư mục xuất này")
         self.btn_open_folder.setObjectName("openFolderBtn")
-        self.btn_open_folder.setFixedHeight(_s(38, sc))
+        self.btn_open_folder.setFixedHeight(_s(40, sc))
         lv.addWidget(self.btn_open_folder)
 
         self.lb_output = QtWidgets.QLabel("Output: C:\\Users\\Admin\\Desktop\\VIDEO AI")
@@ -148,7 +148,7 @@ class Ui_Widget(object):
         self.cb_scene_count = QtWidgets.QComboBox()
         self.cb_scene_count.addItems([str(i) for i in range(1, 21)])
         self.cb_scene_count.setCurrentIndex(9)  # mặc định = 10
-        self.cb_scene_count.setFixedHeight(_s(28, sc))
+        self.cb_scene_count.setFixedHeight(_s(26, sc))
         lv.addWidget(self.cb_scene_count)
 
         self.lb_duration_inline = QtWidgets.QLabel("Thời gian: 80 giây")
@@ -224,12 +224,12 @@ class Ui_Widget(object):
         # Top row: language + version + New
         topRow = QtWidgets.QHBoxLayout()
         lang_cb = self._combo(["Tiếng Việt (Vietnamese)", "English", "Japanese"])
-        lang_cb.setMinimumWidth(_s(220, sc))
+        lang_cb.setMinimumWidth(_s(180, sc))
         ver_lb = QtWidgets.QLabel("v1.5.9")
         ver_lb.setObjectName("verLabel")
         new_btn = QtWidgets.QPushButton("● New")
         new_btn.setObjectName("newBtn")
-        new_btn.setFixedHeight(_s(34, sc))
+        new_btn.setFixedHeight(_s(36, sc))
         topRow.addWidget(lang_cb)
         topRow.addWidget(ver_lb)
         topRow.addStretch()
@@ -257,7 +257,7 @@ class Ui_Widget(object):
         # Analyze button
         btn_analyze = QtWidgets.QPushButton("🚀  BẮT ĐẦU TẠO VIDEO")
         btn_analyze.setObjectName("analyzeBtn")
-        btn_analyze.setFixedHeight(_s(46, sc))
+        btn_analyze.setFixedHeight(_s(48, sc))
         layout.addWidget(btn_analyze)
         setattr(self, f"{prefix}_btn_analyze", btn_analyze)
 
@@ -274,7 +274,7 @@ class Ui_Widget(object):
         for text, obj, attr in actions:
             b = QtWidgets.QPushButton(text)
             b.setObjectName(obj)
-            b.setFixedHeight(_s(34, sc))
+            b.setFixedHeight(_s(36, sc))
             b.setCursor(QtCore.Qt.PointingHandCursor)
             actionRow.addWidget(b)
             setattr(self, attr, b)
@@ -292,7 +292,7 @@ class Ui_Widget(object):
         ref_img_lb = QtWidgets.QLabel("ẢNH THAM CHIẾU")
         ref_img_lb.setObjectName("refImgBox")
         ref_img_lb.setAlignment(QtCore.Qt.AlignCenter)
-        ref_img_lb.setFixedWidth(_s(180, sc))
+        ref_img_lb.setFixedWidth(_s(160, sc))
 
         ref_txt = QtWidgets.QLabel(
             "MEO ME (Adult female cat, white fur, red dress...)  "
@@ -330,8 +330,8 @@ class Ui_Widget(object):
         sc = self._sc
         card = QtWidgets.QFrame()
         card.setObjectName("sceneCardActive" if active else "sceneCard")
-        card.setMinimumHeight(_s(165, sc))
-        card.setMaximumHeight(_s(185, sc))
+        card.setMinimumHeight(_s(160, sc))
+        card.setMaximumHeight(_s(180, sc))
 
         hl = QtWidgets.QHBoxLayout(card)
         hl.setContentsMargins(_s(10,sc), _s(10,sc), _s(10,sc), _s(10,sc))
@@ -340,7 +340,7 @@ class Ui_Widget(object):
         preview = QtWidgets.QLabel(f"SCENE {idx}")
         preview.setObjectName("previewBox")
         preview.setAlignment(QtCore.Qt.AlignCenter)
-        preview.setFixedSize(_s(200, sc), _s(115, sc))
+        preview.setFixedSize(_s(180, sc), _s(100, sc))
 
         vr = QtWidgets.QVBoxLayout()
         vr.setSpacing(_s(4, sc))
@@ -353,7 +353,7 @@ class Ui_Widget(object):
 
         prompt = QtWidgets.QTextEdit()
         prompt.setObjectName("promptBox")
-        prompt.setFixedHeight(_s(58, sc))
+        prompt.setFixedHeight(_s(54, sc))
         prompt.setPlainText(
             "anime style, vibrant colors, clean outlines, soft cel shading, "
             "detailed eyes, studio-quality anime frame, high-clarity character design..."
@@ -386,7 +386,7 @@ class Ui_Widget(object):
         kol_ver_lb.setObjectName("verLabel")
         kol_new_btn = QtWidgets.QPushButton("● New")
         kol_new_btn.setObjectName("newBtn")
-        kol_new_btn.setFixedHeight(_s(34, sc))
+        kol_new_btn.setFixedHeight(_s(36, sc))
         topRow.addWidget(kol_lang_cb)
         topRow.addWidget(kol_ver_lb)
         topRow.addStretch()
@@ -414,13 +414,13 @@ class Ui_Widget(object):
         # ── Analyze button (giống Veo3)
         kol_btn_analyze = QtWidgets.QPushButton("🚀  BẮT ĐẦU TẠO VIDEO")
         kol_btn_analyze.setObjectName("kolAnalyzeBtn")
-        kol_btn_analyze.setFixedHeight(_s(46, sc))
+        kol_btn_analyze.setFixedHeight(_s(48, sc))
         layout.addWidget(kol_btn_analyze)
         self.kol_btn_analyze = kol_btn_analyze
 
         # ── Action buttons row (giống Veo3)
         actionRow = QtWidgets.QHBoxLayout()
-        actionRow.setSpacing(_s(5, sc))
+        actionRow.setSpacing(_s(3, sc))
         kol_actions = [
             ("⏱ Đang xử lý...  0/10",    "actionBtnProcess", "kol_btn_running"),
             ("🎬 Ghép Video",              "actionBtnMerge",   "kol_btn_merge"),
@@ -431,7 +431,7 @@ class Ui_Widget(object):
         for text, obj, attr in kol_actions:
             b = QtWidgets.QPushButton(text)
             b.setObjectName(obj)
-            b.setFixedHeight(_s(34, sc))
+            b.setFixedHeight(_s(36, sc))
             b.setCursor(QtCore.Qt.PointingHandCursor)
             actionRow.addWidget(b)
             setattr(self, attr, b)
@@ -481,13 +481,13 @@ class Ui_Widget(object):
         kol_prompt = QtWidgets.QLineEdit()
         kol_prompt.setPlaceholderText("✍️  Nhập mô tả KOL (phong cách, giọng nói, ngoại hình...)...")
         kol_prompt.setObjectName("kolPromptInput")
-        kol_prompt.setFixedHeight(_s(34, sc))
+        kol_prompt.setFixedHeight(_s(36, sc))
         self.kol_le_prompt = kol_prompt
 
         kol_upload_btn = QtWidgets.QPushButton("📷  Gửi ảnh KOL")
         kol_upload_btn.setObjectName("kolUploadBtn")
-        kol_upload_btn.setFixedHeight(_s(34, sc))
-        kol_upload_btn.setFixedWidth(_s(130, sc))
+        kol_upload_btn.setFixedHeight(_s(36, sc))
+        kol_upload_btn.setFixedWidth(_s(120, sc))
         kol_upload_btn.setCursor(QtCore.Qt.PointingHandCursor)
         self.kol_btn_upload = kol_upload_btn
 
@@ -507,7 +507,7 @@ class Ui_Widget(object):
         ref_img_lb = QtWidgets.QLabel("ẢNH THAM CHIẾU")
         ref_img_lb.setObjectName("refImgBox")
         ref_img_lb.setAlignment(QtCore.Qt.AlignCenter)
-        ref_img_lb.setFixedWidth(_s(180, sc))
+        ref_img_lb.setFixedWidth(_s(160, sc))
         ref_txt = QtWidgets.QLabel(
             "KOL (Phong cách, ngoại hình, giọng nói...)  "
             "VIDEO (Nội dung, cảnh quay, hiệu ứng...)"
@@ -636,10 +636,10 @@ class Ui_Widget(object):
     # ─── QSS ───
     def _apply_qss(self):
         sc = self._sc
-        fs    = _s(11, sc)
-        fs_sm = _s(10, sc)
-        fs_lg = _s(13, sc)
-        fs_tab= _s(12, sc)
+        fs    = _s(13, sc)
+        fs_sm = _s(12, sc)
+        fs_lg = _s(16, sc)
+        fs_tab= _s(14, sc)
         r     = _s(6, sc)
         tp    = _s(8, sc)
         th    = _s(8, sc)
@@ -703,7 +703,7 @@ class Ui_Widget(object):
         }}
         QLineEdit:focus, QTextEdit:focus, QSpinBox:focus {{ border: 1px solid #38bdf8; }}
         QSpinBox::up-button, QSpinBox::down-button {{ width: {_s(20,sc)}px; background: transparent; border: none; }}
-        #bigInput {{ min-height: {_s(34,sc)}px; }}
+        #bigInput {{ min-height: {_s(38,sc)}px; }}
         #promptBox {{ background: transparent; border: none; font-size: {fs_sm}px; color: #cbd5e1; font-style: italic; }}
 
         /* ── BUTTONS ── */
@@ -740,14 +740,14 @@ class Ui_Widget(object):
         #proxyBrowseBtn {{
             background: #1e293b;
             border: 1px solid #334155;
-            color: #94a3b8; font-size: {_s(13,sc)}px;
+            color: #94a3b8; font-size: {_s(14,sc)}px;
             border-radius: {_s(4,sc)}px;
         }}
         #proxyBrowseBtn:hover {{ background: #334155; color: white; }}
 
         #analyzeBtn {{
             background: qlineargradient(x1:0,y1:0,x2:1,y2:0, stop:0 #7c3aed, stop:1 #c084fc);
-            border: none; color: white; font-size: {_s(15,sc)}px;
+            border: none; color: white; font-size: {_s(17,sc)}px;
         }}
         #analyzeBtn:hover {{ background: qlineargradient(x1:0,y1:0,x2:1,y2:0, stop:0 #6d28d9, stop:1 #a855f7); }}
 
@@ -920,13 +920,13 @@ class Ui_Widget(object):
     def retranslateUi(self, Widget):
         Widget.setWindowTitle("🎬 AI Video Tool - Grok / Veo3 / Seedance 2.0")
 
-
-if __name__ == "__main__":
-    import sys
-    from PyQt5.QtWidgets import QApplication, QMainWindow
-    app = QApplication(sys.argv)
-    w = QMainWindow()
-    ui = Ui_Widget()
-    ui.setupUi(w)
-    w.showMaximized()
-    sys.exit(app.exec_())
+# test 1
+# if __name__ == "__main__":
+#     import sys
+#     from PyQt5.QtWidgets import QApplication, QMainWindow
+#     app = QApplication(sys.argv)
+#     w = QMainWindow()
+#     ui = Ui_Widget()
+#     ui.setupUi(w)
+#     w.showMaximized()
+#     sys.exit(app.exec_())

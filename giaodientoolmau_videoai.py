@@ -186,5 +186,5 @@ class Manager(QtWidgets.QMainWindow, Ui_Widget):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     window = Manager()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec_())
