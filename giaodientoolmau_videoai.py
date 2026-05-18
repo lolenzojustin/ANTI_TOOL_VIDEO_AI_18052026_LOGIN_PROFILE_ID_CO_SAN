@@ -83,9 +83,9 @@ class MultiThread(QThread):
                 except Exception:
                     pass
                 
-                # Mở ChatGPT và nhập prompt
+                # Bước 1: vào trang https://labs.google/fx/vi/tools/flow
                 try:
-                    page.goto("https://chatgpt.com/", timeout=60000, wait_until="domcontentloaded")
+                    page.goto("https://labs.google/fx/vi/tools/flow", timeout=60000, wait_until="domcontentloaded")
                 except PlaywrightTimeoutError:
                     print(f"[Cảnh {self.index}] goto timeout, tiếp tục...")
                 
@@ -95,9 +95,23 @@ class MultiThread(QThread):
                     status = "Đã dừng"
                     return
                 
-                # Xử lý popup thông báo cookie nếu có
+                # Bước 2: Đợi load xong trang thì Bấm Dự án mới
                 try:
-                    # Tìm nút X (đóng) thông qua các thuộc tính phổ biến của nút đóng popup
+                    new_project_btn = page.locator('[data-type="button-overlay"]').first
+                    new_project_btn.wait_for(state="visible", timeout=15000)
+                    new_project_btn.click()
+                    print(f"[Cảnh {self.index}] Đã bấm Dự án mới.")
+                except Exception as e:
+                    print(f"[Cảnh {self.index}] Lỗi khi bấm Dự án mới: {e}")
+                
+                # Kiểm tra dừng
+                if not self.is_running:
+                    browser.close()
+                    status = "Đã dừng"
+                    return
+                
+                # Xử lý popup thông báo cookie nếu có (giữ nguyên cấu trúc xử lý popup chung)
+                try:
                     close_btn = page.locator('button[aria-label="Close"], button[aria-label="Đóng"], [role="dialog"] button:has(svg)').first
                     close_btn.wait_for(state="visible", timeout=3000)
                     close_btn.click()
@@ -107,20 +121,18 @@ class MultiThread(QThread):
                 except Exception:
                     pass
                 
-                # Chọn thẻ input của ChatGPT
-                search_input = page.locator('#prompt-textarea, div[contenteditable="true"]').last
+                # Bước 3: Sau khi bấm Dự án mới load xong thì gõ vào prompt của dự án đó
+                search_input = page.locator('textarea:visible, div[contenteditable="true"]:visible').last
                 search_input.wait_for(state="visible", timeout=15000)
                 search_input.click()
                 page.keyboard.type(self.prompt_text)
-                page.keyboard.press("Enter")
-                # Đợi một lát để trang load kết quả
-                # page.wait_for_timeout(3000) 
-                time.sleep(3)  # Dùng sleep thay vì wait_for để dễ dàng ngắt nếu dừng giữa chừng
                 
-                # Sau khi tìm kiếm xong, đánh dấu hoàn thành và đóng browser
+                # Bước 4: Sau khi gõ prompt xong thì đợi 10 giây là xong 1 luồng chứ ko bấm nút enter
+                time.sleep(10)
+                
+                # Sau khi xong, đánh dấu hoàn thành và đóng browser
                 status = "Hoàn thành"
-                print(f"[Cảnh {self.index}] ✅ Đã tìm kiếm xong, chuẩn bị đóng browser")
-                time.sleep(8)  # Đợi thêm 8 giây trước khi đóng browser
+                print(f"[Cảnh {self.index}] ✅ Đã gõ prompt xong và đợi 10s, chuẩn bị đóng browser")
                 browser.close()
                 
         except Exception as e:
