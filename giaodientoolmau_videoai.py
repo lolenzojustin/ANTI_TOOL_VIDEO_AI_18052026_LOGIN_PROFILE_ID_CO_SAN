@@ -175,14 +175,25 @@ class PromptApiThread(QThread):
     finished = pyqtSignal()
     prompt_result = pyqtSignal(int, str)
 
-    def __init__(self, urls):
+    def __init__(self, urls, payload, post_url):
         super().__init__()
         self.urls = urls
+        self.payload = payload
+        self.post_url = post_url
 
     def run(self):
+        # 1. Gọi API POST để gửi thông tin lên N8N
+        try:
+            print(f"[Phân tích Prompt] Đang gọi API POST: {self.post_url}")
+            response_post = requests.post(self.post_url, json=self.payload, timeout=60)
+            print(f"[Phân tích Prompt] Đã gửi POST thành công - Status: {response_post.status_code}")
+        except Exception as e:
+            print(f"[Phân tích Prompt] Lỗi gọi API POST N8N: {e}")
+
+        # 2. Gọi các API GET theo số lượng cảnh để nhận kết quả cho giao diện
         for index, url in enumerate(self.urls, start=1):
             try:
-                print(f"[Phân tích Prompt] Đang gọi API {index}: {url}")
+                print(f"[Phân tích Prompt] Đang gọi API GET {index}: {url}")
                 response = requests.get(url, timeout=15)
                 
                 try:
@@ -191,11 +202,12 @@ class PromptApiThread(QThread):
                     if content:
                         self.prompt_result.emit(index, content)
                 except ValueError:
-                    print(f"[Phân tích Prompt] Không thể parse JSON từ API {index}")
+                    print(f"[Phân tích Prompt] Không thể parse JSON từ API GET {index}")
 
-                print(f"[Phân tích Prompt] Hoàn thành API {index} - Status: {response.status_code}")
+                print(f"[Phân tích Prompt] Hoàn thành API GET {index} - Status: {response.status_code}")
             except Exception as e:
-                print(f"[Phân tích Prompt] Lỗi gọi API {index}: {e}")
+                print(f"[Phân tích Prompt] Lỗi gọi API GET {index}: {e}")
+                
         self.finished.emit()
 
 class Manager(QtWidgets.QMainWindow, Ui_Widget):
@@ -329,19 +341,31 @@ class Manager(QtWidgets.QMainWindow, Ui_Widget):
         if input_soluong <= 0:
             return
 
-        # Lấy số lượng API theo số cảnh chọn (tối đa bằng độ dài mảng URL)
-        urls_to_call = self.WEBHOOK_URLS[:input_soluong]
-
         # Khởi chạy thread để call API không làm đơ UI
         if self.prompt_thread and self.prompt_thread.isRunning():
             QMessageBox.warning(self, "Cảnh báo", "Đang phân tích tạo prompt, vui lòng đợi!")
             return
 
-        print(f"[Manager] Bắt đầu gọi {len(urls_to_call)} API phân tích prompt...")
+        urls_to_call = self.WEBHOOK_URLS[:input_soluong]
+        api_url = "https://n8n.aiplt.io.vn/webhook/webhook_get_data_tool"
+        print(f"[Manager] Bắt đầu gọi {len(urls_to_call)} API (GET) và 1 API POST...")
         self._set_prompt_btn_running(True)
         QtWidgets.QApplication.processEvents()
 
-        self.prompt_thread = PromptApiThread(urls_to_call)
+        # Thu thập 8 thông tin từ UI
+        payload = {
+            "link_youtube": self.veo3_le_link.text().strip() if hasattr(self, 'veo3_le_link') else "",
+            "mo_ta_them": self.veo3_le_desc.text().strip() if hasattr(self, 'veo3_le_desc') else "",
+            "mo_hinh_sinh_kich_ban": self.cb_ai_model.currentText(),
+            "asynclab_api_key": self.le_api_key.text().strip(),
+            "phong_cach": self.cb_style.currentText(),
+            "ngon_ngu": self.cb_language.currentText(),
+            "ty_le_copy": self.cb_copy_ratio.currentText(),
+            "giong_nhan_vat": self.te_voice_desc.toPlainText().strip(),
+            "so_canh": input_soluong
+        }
+
+        self.prompt_thread = PromptApiThread(urls_to_call, payload, api_url)
         self.prompt_thread.prompt_result.connect(self._on_prompt_result)
         self.prompt_thread.finished.connect(self._on_prompt_thread_finished)
         self.prompt_thread.start()
